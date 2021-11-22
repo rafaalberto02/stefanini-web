@@ -1,47 +1,52 @@
-<select name="person-change" (change)="changeSelectedUser($event.target.value)">
-  <option value="" disabled selected>Select a user</option>
-  <option value="{{ person.businessEntityID }}" *ngFor="let person of persons">
-    {{ person.name }}
-  </option>
-</select>
-
-<p class="person-businessEntityID">
-  Person ID: {{ selectedPerson?.businessEntityID }}
-</p>
-<p class="person-name">Person Name: {{ selectedPerson?.name }}</p>
-
-<div class="number-types">
-  <div *ngFor="let type of phoneNumberTypes; let i = index" class="type">
-    <label for="number-type">{{ type.name }}</label>
-    <input
-      type="text"
-      name="number-type"
-      id="number-type"
-      value="{{ getPhoneNumber(i) }}"
-      [(ngModel)]="phoneNumbers[i]"
-    />
-    <button
-      (click)="
-        updatePhoneNumber(
-          selectedPerson?.businessEntityID,
-          i,
-          type.phoneNumberTypeID
-        )
-      "
+<div class="border col-3 m-4 p-4 rounded">
+  <select
+    class="form-select mb-4"
+    name="person-select"
+    (change)="changeSelectedUser($event.target.value)"
+  >
+    <option value="" disabled selected>Select a user</option>
+    <option
+      *ngFor="let person of persons"
+      value="{{ person.businessEntityID }}"
     >
-      <p>Update</p>
-    </button>
-    <button
-      (click)="
-        deletePhoneNumber(
-          selectedPerson?.businessEntityID,
-          type.phoneNumberTypeID
-        )
-      "
-    >
-      <p>Delete</p>
-    </button>
+      {{ person.businessEntityID }} - {{ person.name }}
+    </option>
+  </select>
+
+  <p class="person-id">Person ID: {{ selectedPerson?.businessEntityID }}</p>
+  <p class="person-name">Person Name: {{ selectedPerson?.name }}</p>
+
+  <div class="number-types mb-3">
+    <div *ngFor="let type of phoneNumberTypes; let i = index" class="type">
+      <label for="number-type-{{ type.phoneNumberTypeID }}" class="form-label"
+        >{{ type.name }}:</label
+      >
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control"
+          name="number-type-{{ type.phoneNumberTypeID }}"
+          id="number-type-{{ type.phoneNumberTypeID }}"
+          class="form-control"
+          [(ngModel)]="phoneNumbers[i]"
+        />
+        <button
+          (click)="updatePhoneNumber(i, type.phoneNumberTypeID)"
+          class="btn btn-success"
+          type="button"
+        >
+          Update
+        </button>
+        <button
+          (click)="deletePhoneNumber(type.phoneNumberTypeID)"
+          class="btn btn-danger"
+          type="button"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
   </div>
-</div>
 
-<pre>{{ selectedPerson | json }}</pre>
+  <pre class="border col p-4 rounded">{{ selectedPerson | json }}</pre>
+</div>

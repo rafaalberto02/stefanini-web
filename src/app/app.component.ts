@@ -1,13 +1,13 @@
-import { PersonPhoneResponse } from "./core/model/personPhoneResponse";
-import { PhoneNumberTypeListResponse } from "./core/model/phoneNumberTypeListResponse";
-import { PersonDto } from "./core/model/personDto";
+import { PersonDto } from "./core/model/dtos/personDto";
 import { PersonPhoneService } from "./core/services/person-phone.service";
 import { Component, OnInit } from "@angular/core";
 import { PersonService } from "./core/services/person.service";
-import { PersonResponse } from "./core/model/personResponse";
 import { PersonPhoneTypeService } from "./core/services/person-phone-type.service";
-import { PhoneNumberTypeDto } from "./core/model/phoneNumberTypeDto";
-import { PersonPhoneRequest } from "./core/model/personPhoneRequest";
+import { PhoneNumberTypeDto } from "./core/model/dtos/phoneNumberTypeDto";
+import { PersonPhoneRequest } from "./core/model/request/personPhoneRequest";
+import { PersonPhoneResponse } from "./core/model/response/personPhoneResponse";
+import { PersonResponse } from "./core/model/response/personResponse";
+import { PhoneNumberTypeListResponse } from "./core/model/response/phoneNumberTypeListResponse";
 
 @Component({
   selector: "app-root",
@@ -31,23 +31,19 @@ export class AppComponent implements OnInit {
     this.getPhoneNumberTypes();
   }
 
-  changeSelectedUser(id: Number): void {
-    this.selectedPerson = this.persons.filter(
-      (person) => person.businessEntityID == id
-    )[0];
+  changeSelectedUser(id: number): void {
+    this.selectedPerson = this.getPersonById(id);
     this.phoneNumbers = [];
     this.phoneNumberTypes.forEach((type, i) => {
-      this.selectedPerson.phones.forEach(
-        (phone) =>
-          (this.phoneNumbers[i] =
-            type.phoneNumberTypeID == phone.phoneNumberTypeID
-              ? phone.phoneNumber
-              : this.phoneNumbers[i])
-      );
+      let number = this.getSelectedUserNumberByType(type.phoneNumberTypeID);
+      this.phoneNumbers[i] = number;
     });
   }
 
-  deletePhoneNumber(businessEntityID, phoneNumberTypeID): void {
+  deletePhoneNumber(
+    phoneNumberTypeID: number,
+    businessEntityID: number = this.selectedPerson.businessEntityID
+  ): void {
     const request = {
       businessEntityID: businessEntityID,
       phoneNumberTypeID: phoneNumberTypeID,
@@ -65,9 +61,9 @@ export class AppComponent implements OnInit {
   }
 
   updatePhoneNumber(
-    businessEntityID,
-    indexOfPhoneNumber,
-    phoneNumberTypeID
+    indexOfPhoneNumber: number,
+    phoneNumberTypeID: number,
+    businessEntityID: number = this.selectedPerson.businessEntityID
   ): void {
     const request = {
       businessEntityID: businessEntityID,
@@ -105,5 +101,18 @@ export class AppComponent implements OnInit {
       },
     });
   }
-  title = "project-v1-web";
+
+  private getPersonById(id: number): PersonDto {
+    return this.persons.filter((person) => person.businessEntityID == id)[0];
+  }
+
+  private getSelectedUserNumberByType(phoneNumberTypeId: number): string {
+    const phone = this.selectedPerson.phones.find((phone) => {
+      return phone.phoneNumberTypeID == phoneNumberTypeId;
+    });
+
+    if (phone != null) return phone.phoneNumber;
+
+    return null;
+  }
 }
